@@ -35,6 +35,8 @@ $version = "version=" . $version . "\n";
 $secret_text = $rsa->privateEncrypt( $version . $secret_key );
 
 //将加密后的内容写进文件
+if ( ! file_exists( "tmp" ) )
+    mkdir( "tmp" );
 $file_version_ini = fopen( "tmp/version.ini", "w" ) or die( "Failed to generate version.ini!" );
 fwrite( $file_version_ini, $secret_text );
 fclose( $file_version_ini );

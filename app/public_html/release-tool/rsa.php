@@ -61,6 +61,17 @@ class Rsa {
         fclose( $file );
     }
 
+    public function setPrivateKey( $key ) {
+        $this->private_key = $key;
+        try {
+            if( false == ( $this->private_key_resource = $this->is_bad_private_key( $this->private_key ) ) ) {
+                throw new Exception( 'private key  no usable' );
+            }
+        } catch ( Exception $e ) {
+            die( $e->getMessage() );
+        }
+    }
+
     public function setPublicKey( $key ) {
         $this->public_key = $key;
         try {
@@ -87,6 +98,7 @@ class Rsa {
         $timestamp = time();
         $private_key_file = 'tmp/' . $timestamp . '_rsa';
         $public_key_file = 'tmp/' . $timestamp . '_rsa.pub';
+        if ( ! file_exists( 'tmp' ) ) mkdir( 'tmp' );
         self::write_key_to_file( $private_key_file, $private_key );
         self::write_key_to_file( $public_key_file, $public_key[ 'key' ] );
         return array( $timestamp . '_rsa', $timestamp . '_rsa.pub');

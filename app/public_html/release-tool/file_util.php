@@ -131,4 +131,22 @@ class FileUtil {
         return true;
     }
 
+    /**
+     * 读文件
+     * @param string $file_url
+     * @return content 文件文本内容
+     */
+    public static function readFile( $file_url ) {
+        if ( ! file_exists( $file_url ) ) {
+            return false;
+        }
+        $file = fopen( $file_url, "r" );
+        if ( ! $file ) {
+            return false;
+        }
+        $file_content = fread( $file, filesize( $file_url ) );
+        fclose( $file );
+        return $file_content;
+    }
+
 }
