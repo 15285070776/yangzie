@@ -96,12 +96,17 @@ class Rsa {
         openssl_pkey_export( $res, $private_key, null, $config );
         $public_key = openssl_pkey_get_details( $res );
         $timestamp = time();
-        $private_key_file = 'tmp/' . $timestamp . '_rsa';
-        $public_key_file = 'tmp/' . $timestamp . '_rsa.pub';
+
+        $key_file = 'tmp/' . $timestamp . '.key';
+//        $private_key_file = 'tmp/' . $timestamp . '_rsa.prt';
+//        $public_key_file = 'tmp/' . $timestamp . '_rsa.pub';
         if ( ! file_exists( 'tmp' ) ) mkdir( 'tmp' );
-        self::write_key_to_file( $private_key_file, $private_key );
-        self::write_key_to_file( $public_key_file, $public_key[ 'key' ] );
-        return array( $timestamp . '_rsa', $timestamp . '_rsa.pub');
+        self::write_key_to_file( $key_file, $private_key . $public_key[ 'key' ] );
+//        self::write_key_to_file( $private_key_file, $private_key );
+//        self::write_key_to_file( $public_key_file, $public_key[ 'key' ] );
+//        return array( $timestamp . '_rsa.prt', $timestamp . '_rsa.pub');
+
+        return $timestamp . '.key';
     }
 
     /**

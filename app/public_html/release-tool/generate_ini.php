@@ -2,13 +2,13 @@
 /**
  * 读取公钥和私钥文件的内容，将version.ini的内容使用私钥加密再保存到version.ini中
  * 生成version.ini文件 该文件格式为[version="版本号"   secret_key="public_key"]
- *
+ * version.ini需要保存到本地文件，并且命名为version.ini
  * @author zhangwengang
  * Date: 2018/10/11
  * Time: 16:49
  */
 
-require_once "rsa.php";
+require_once "__config__.php";
 
 $version = trim( $_POST[ "version" ] );
 $private_key_file = $_FILES[ "private_key_file" ][ "tmp_name" ];
@@ -35,11 +35,13 @@ $version = "version=" . $version . "\n";
 $secret_text = $rsa->privateEncrypt( $version . $secret_key );
 
 //将加密后的内容写进文件
-if ( ! file_exists( "tmp" ) )
-    mkdir( "tmp" );
-$file_version_ini = fopen( "tmp/version.ini", "w" ) or die( "Failed to generate version.ini!" );
+$file_version_ini = fopen( TEMP_DIR . "version.ini", "w" ) or die( "Failed to generate version.ini!" );
 fwrite( $file_version_ini, $secret_text );
 fclose( $file_version_ini );
 
 echo " success<br> ";
+
+header( "Content-type: text/html; charset=utf-8" );
+header( 'location:' . TEMP_DIR . "version.ini");
+
 

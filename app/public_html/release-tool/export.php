@@ -6,23 +6,15 @@
  * Time: 16:05
  */
 
-require_once "file_util.php";
-require_once "rsa.php";
-require_once "keys.php";
-define( "YZE_LOG_PATH", "C:\wamp64\logs" );
-define( "MYSQL_BIN_PATH", "C:\wamp64\bin\mysql\mysql5.7.14\bin\\" ); //mysql的bin目录，将会使用mysqldump备份文件以及使用mysql更新数据库
-define( "YZE_MYSQL_USER",  "root" );
-define( "YZE_MYSQL_DB",  "test" );
-define( "YZE_MYSQL_PASS",  "ydhl" );
+require_once "__config__.php";
 
 $action = $_GET[ "action" ];
-
 function export_file ($filename, $tmp_file_name) {
     echo "文件导出中......<br>";
     if ( file_exists( $filename ) ) {
-        if ( FileUtil::copyFile( $filename, "./tmp/" . $tmp_file_name, true ) ) {
+        if ( FileUtil::copyFile( $filename, TEMP_DIR . $tmp_file_name, true ) ) {
             header( "Content-type: text/html; charset=utf-8" );
-            header( 'location:' . "./tmp/" . $tmp_file_name );
+            header( 'location:' . TEMP_DIR . $tmp_file_name );
         } else {
             die( $tmp_file_name . "拷贝失败<br>" );
         }
@@ -32,11 +24,17 @@ function export_file ($filename, $tmp_file_name) {
 }
 
 function export_db_file () {
+    if ( ! YZE_MYSQL_BIN_PATH ) {
+        die( "还没有配置mysql/bin的路径");
+    }
+    if ( ! file_exists( YZE_MYSQL_BIN_PATH ) ) {
+        die( YZE_MYSQL_BIN_PATH . " 不存在" );
+    }
     $file = date( "Ymd", time()) . ".sql";
     if ( ! file_exists( $file ) ) {
-        echo "数据库备份中......";
+        echo "数据库备份中......<br>";
         //数据库备份
-        $exec = MYSQL_BIN_PATH . "mysqldump -u " . YZE_MYSQL_USER . " -p" . YZE_MYSQL_PASS . " " . YZE_MYSQL_DB . " > ./tmp/" . $file;
+        $exec = YZE_MYSQL_BIN_PATH . "/mysqldump -u " . YZE_MYSQL_USER . " -p" . YZE_MYSQL_PASS . " " . YZE_MYSQL_DB . " > " . TEMP_DIR . $file;
         $output = [];
         exec( $exec, $output, $ret_var );
         if ( $ret_var != 0 )
@@ -44,14 +42,20 @@ function export_db_file () {
         echo "数据库备份成功<br>";
     }
     header( "Content-type: text/html; charset=utf-8" );
-    header( 'location:' . "./tmp/" . $file );
+    header( 'location:' . TEMP_DIR . $file );
 }
 
 if ( $action == "export_log" ) {
-    export_file( YZE_LOG_PATH . "/apache_error.log", "apache_error.log" );
+    if ( ! YZE_LOG_PATH_NAME ) {
+        die( "还没有配置日志文件路径" );
+    }
+    if ( ! file_exists( YZE_LOG_PATH_NAME ) ) {
+        die( YZE_LOG_PATH_NAME . " 不存在" );
+    }
+    export_file( YZE_LOG_PATH_NAME, "apache_error.log" );
 } else if ( $action == "export_db" ) {
     $pass = trim( $_POST[ "db_password" ] );
-    $private_key_file = $_FILES[ "private_key_file" ][ "tmp_name" ];
+    $private_key_file = $_FILES[ "private_key" ][ "tmp_name" ];
     if ( ! $pass ) {
         die( "db pass is empty!" );
     }
@@ -81,11 +85,13 @@ if ( $action == "export_log" ) {
                 die( "密码错误" );
             }
             break;
-        } else {
-            die( "密钥验证错误" );
         }
     }
     if ( $verify_success_flag ) {
         export_db_file();
+    } else {
+        die( "密钥验证错误" );
     }
 }
+
+?>

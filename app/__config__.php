@@ -24,6 +24,10 @@ ini_set('error_reporting', E_ALL & ~E_STRICT);//错误级别
 date_default_timezone_set('Asia/Chongqing');//时区
 define("APPLICATION_NAME", "Yangzie");//应用名称
 
+//代码发布工具配置
+define( "YZE_LOG_PATH_NAME", "" ); //apache错误日志的绝对路径 + 名字      示例：C:\wamp64\logs\apache_error.log
+define( "YZE_MYSQL_BIN_PATH", "" ); //wampserver下的mysql的bin目录，将会使用mysqldump备份文件以及使用mysql更新数据库
+
 
 /**
  * app模块配置

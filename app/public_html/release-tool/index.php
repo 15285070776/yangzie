@@ -5,8 +5,11 @@
  * Date: 2018/10/11
  * Time: 15:53
  */
+require_once "__config__.php";
 ?>
-
+<html>
+<head>
+    <meta charset="utf-8">
 <style type="text/css">
 #box{
     position:absolute;
@@ -17,10 +20,11 @@
     border: 5px;
 }
 </style>
-
+</head>
+<body>
 <div id="box">
     <div ><button class="action_button" onclick="exportLog()">导出日志</button></div>
-    <div ><button class="action_button" id="generate_key">生成新密钥对</button></div>
+    <div ><button class="action_button" id="generate_key" onclick="generateKey()">生成新密钥对</button></div>
     <div >
         <button class="action_button" id="generate_ini">使用现有密钥对生成version.ini</button>
         <form id="choose_secret_key" style="visibility: hidden" method="post" action="generate_ini.php" enctype="multipart/form-data">
@@ -41,36 +45,28 @@
         <button class="action_button" id="export_db">导出数据库</button>
         <form id="db_info" style="visibility: hidden" method="post" action="export.php?action=export_db" enctype="multipart/form-data">
             DB PASS：<input class="input_class" type="password" id="db_password" name="db_password">
-            私钥：<input class="input_class" type="file" id="private_key_file" name="private_key_file">
+            私钥：<input class="input_class" type="file" id="private_key" name="private_key">
             <input class="form_submit" type="button" value="提交" onclick="disabledButton('db_info')">
         </form>
     </div>
 </div>
 
-<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js">
-</script>
-
 <script type="text/javascript">
-    $("#generate_key").click(function () {
-        $.post("generate_key.php", null, function(data,status){
-            if (status == "success") {
-                alert("密钥对:" + data);
-            } else {
-                alert("密钥生成失败");
-            }
-        });
+    function generateKey() {
+        window.location.href = "generate_key.php";
+    }
+
+    var generateIni = document.getElementById("generate_ini");
+    generateIni.addEventListener("click", function () {
+       document.getElementById("choose_secret_key").style.visibility = "visible";
     });
 
-    $("#generate_ini").click(function () {
-        $("#choose_secret_key").css("visibility", "visible");
+    document.getElementById("update_code").addEventListener("click", function () {
+       document.getElementById("choose_code_zip").style.visibility = "visible";
     });
-
-    $("#update_code").click(function () {
-        $("#choose_code_zip").css("visibility", "visible");
-    });
-
-    $("#export_db").click(function () {
-        $("#db_info").css("visibility", "visible");
+    
+    document.getElementById("export_db").addEventListener("click", function () {
+       document.getElementById("db_info").style.visibility = "visible";
     });
 
     function exportLog() {
@@ -78,8 +74,40 @@
     }
 
     function disabledButton(form_id) {
-        $(".action_button").attr("disabled", "true");
-        $(".form_submit").attr("disabled", "true");
+        var actionButton = getElementsByClassName("action_button");
+        var formSubmit = getElementsByClassName("form_submit");
+        for (var i = 0; i < actionButton.length; i++) {
+            actionButton[i].disabled = true;
+        }
+        for (var i = 0; i < formSubmit.length; i++) {
+            formSubmit[i].disabled = true;
+        }
         document.forms[form_id].submit();
     }
+
+    /**
+     * getElementByClassName兼容性
+     * @param className 类名
+     * @return HTMLCollectionOf<Collection> | Array
+     */
+    function getElementsByClassName(className) {
+        if (document.getElementsByClassName)
+            return document.getElementsByClassName(className);
+        var result = [];
+        var tags = obj.getElementsByTagName("*");
+        var tagsLength = tags.length;
+        for (var i = 0; i < tagsLength; i++) {
+            var classNames = tags[i].className.split(" ");
+            var classLength = classNames.length;
+            for (var j = 0; j < classLength; j++) {
+                if ( classNames[j] === className ) {
+                    result.push(tags[i]);
+                    break;
+                }
+            }
+        }
+        return result;
+    }
 </script>
+</body>
+</html>

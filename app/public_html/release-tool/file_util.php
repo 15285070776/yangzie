@@ -6,8 +6,6 @@
  * Time: 15:52
  */
 
-//define("PUBLIC_HTML_PATH", dirname(dirname(__FILE__)) . "/");
-define("PUBLIC_HTML_PATH", dirname(dirname(dirname(dirname(__FILE__)))) . "/test/app/public_html/");
 class FileUtil {
 
     /**
@@ -24,6 +22,7 @@ class FileUtil {
             $aim_dir .= $str . '/';
             if (!file_exists($aim_dir)) {
                 $result = mkdir($aim_dir);
+                echo "创建文件夹：{$aim_url}<br>";
             }
         }
         return $result;
@@ -98,7 +97,7 @@ class FileUtil {
             if (!is_dir($old_dir . $file)) {
                 //替换文件时跳过app/public_html/index.php
                 $old_dir_temp = str_replace('\\', '/', $aim_dir);
-                $aim_dir_temp = str_replace('\\', '/', PUBLIC_HTML_PATH);
+                $aim_dir_temp = str_replace('\\', '/', YZE_PUBLIC_HTML);
                 if ($old_dir_temp . $file != $aim_dir_temp . 'index.php')
                     self::copyFile($old_dir . $file, $aim_dir . $file, $over_write);
             } else {
@@ -128,6 +127,7 @@ class FileUtil {
         $aim_dir = dirname($aim_url);
         self::createDir($aim_dir);
         copy($file_url, $aim_url);
+        echo "复制文件 {$file_url}\t到\t{$aim_url}<br>";
         return true;
     }
 
